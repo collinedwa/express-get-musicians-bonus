@@ -6,6 +6,8 @@ const {sequelize} = require('./db');
 
 const port = 8080;
 
+app.use(express.json());
+
 async function seed(){
 	await sequelize.sync({ force: true });
 
@@ -62,11 +64,25 @@ app.put('/musicians/:id', async (req, res) => {
 // The Band Model has an association with many musicians
 // 1. Respond with the Bands including the Musicians in that band.
 
+app.get("/bands", async (req, res) => {
+	allBands = await Band.findAll({
+		include: Musician
+	});
+
+	res.json(allBands);
+})
 
 //TODO: Make a GET Request to the Band Model at a particular ID
 // The Band Model has an association with many musicians 
 // 1. Respond with the paricular band including the musician in that particular band
 
+app.get("/bands/:id", async (req, res) => {
+	foundBand = await Band.findByPk(req.params.id, {
+		include: Musician
+	});
+
+	res.json(foundBand)
+})
 
 app.listen(port, async () => {
 	await seed()
